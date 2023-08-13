@@ -1,13 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Model (Symbol(..)
             , Expression(..)
             , Equation(..)) where
 
 import            Data.Aeson   hiding (json)
-import            Data.Monoid  ((<>))
-import            Data.Text    (Text, pack)
 import            GHC.Generics
 
 -- Symbol
