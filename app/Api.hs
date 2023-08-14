@@ -6,18 +6,26 @@ module Api (rest
 import           Model
 
 import           Web.Spock
-import           Data.IORef             (IORef, readIORef)
+import           Data.IORef             (IORef, modifyIORef', readIORef)
 import           Control.Monad.IO.Class (liftIO)
-import qualified Data.Text as T
 
 data Session = EmptySession
-newtype AppState = DummyAppState (IORef [Equation])
+newtype AppState = DummyAppState (IORef [Envelope Equation])
 
-rest :: SpockM () Session AppState ()
+type Api = SpockM () Session AppState ()
+type ApiAction a = SpockAction () Session AppState a
+
+rest :: Api
 rest =
   do
-      get root $ do
-         (DummyAppState ref) <- getState
-         equations <- liftIO $ readIORef ref
-         json equations
-      get ("test" <//> var) $ \x -> text $ T.pack $ show [1..x :: Integer]
+    get ("api" <//> "v1" <//> "equations") $ do
+      (DummyAppState ref) <- getState
+      equations <- liftIO $ readIORef ref
+      json equations
+    post ("api" <//> "v1" <//> "equations") $ do
+      equation <- jsonBody' :: ApiAction Equation
+      (DummyAppState ref) <- getState
+      envelope <- liftIO $ createEnvelope equation
+      liftIO $ modifyIORef' ref (envelope :)
+      redirect "/api/v1/equations"
+
