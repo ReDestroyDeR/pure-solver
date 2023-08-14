@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Api (rest
-          , Session(..)
-          , AppState(..)) where
+module Api ( rest
+           , Session(..)
+           , AppState(..) ) where
 
 import           Model
 
@@ -28,4 +28,8 @@ rest =
       envelope <- liftIO $ createEnvelope equation
       liftIO $ modifyIORef' ref (envelope :)
       redirect "/api/v1/equations"
+    put ("api" <//> "v1" <//> "equations" <//> var) $ \equationId -> do
+      (DummyAppState ref) <- getState
+    delete ("api" <//> "v1" <//> "equations" <//> var) $ \equationId -> do
+      (DummyAppState ref) <- getState
 

@@ -4,11 +4,12 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Model (Symbol(..)
-            , Envelope(..)
-            , createEnvelope
-            , Expression(..)
-            , Equation(..)) where
+module Model ( Symbol(..)
+             , Envelope(..)
+             , createEnvelope
+             , Expression(..)
+             , Equation(..)
+             , evaluate ) where
 
 import            Data.Aeson   hiding (json)
 import            Data.UUID
@@ -25,24 +26,25 @@ instance ToJSON Symbol
 instance FromJSON Symbol
 
 -- Expression
-data Expression
-  = Expression { x :: Integer
-               , y :: Integer
-               , operator :: Symbol }
+data Operand = Integer | Expression
+data Expression = Operand Operand Symbol
   deriving (Generic, Show, Eq)
+
 
 -- JSON
 instance ToJSON Expression
 instance FromJSON Expression
 
--- Equation
-newtype Equation
-  = Equation {expressions :: [Expression]}
-  deriving (Generic, Show, Eq)
+----------------------------------
+--          Evaluator           --
+----------------------------------
 
--- JSON
-instance ToJSON Equation
-instance FromJSON Equation
+evaluate :: Integer -> Integer -> Symbol -> Integer
+evaluate a b PLUS  = a + b
+evaluate a b MINUS = a + b
+evaluate a b MULT  = a * b
+evaluate a b DIV   = a `div` b
+
 
 ----------------------------------
 -- Parametric Identifiable Data --
