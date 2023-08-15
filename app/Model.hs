@@ -8,7 +8,6 @@ module Model ( Symbol(..)
              , Envelope(..)
              , createEnvelope
              , Expression(..)
-             , Equation(..)
              , evaluate ) where
 
 import            Data.Aeson   hiding (json)
@@ -26,10 +25,8 @@ instance ToJSON Symbol
 instance FromJSON Symbol
 
 -- Expression
-data Operand = Integer | Expression
-data Expression = Operand Operand Symbol
+data Expression = Val Integer | Ex Expression Expression Symbol
   deriving (Generic, Show, Eq)
-
 
 -- JSON
 instance ToJSON Expression
@@ -39,12 +36,13 @@ instance FromJSON Expression
 --          Evaluator           --
 ----------------------------------
 
-evaluate :: Integer -> Integer -> Symbol -> Integer
-evaluate a b PLUS  = a + b
-evaluate a b MINUS = a + b
-evaluate a b MULT  = a * b
-evaluate a b DIV   = a `div` b
-
+evaluate :: Expression -> Integer
+evaluate (Val x)    = x
+evaluate (Ex a b s) = case s of
+  PLUS  -> evaluate a + evaluate b
+  MINUS -> evaluate a - evaluate b
+  MULT  -> evaluate a * evaluate b
+  DIV   -> evaluate a `div` evaluate b
 
 ----------------------------------
 -- Parametric Identifiable Data --
