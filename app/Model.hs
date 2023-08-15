@@ -44,7 +44,7 @@ instance ToJSON Expression where
   toJSON (Ex a b s) = object ["x" .= toJSON a, "y" .= toJSON b, "operator" .= toJSON s]
 
 instance FromJSON Expression where
-    parseJSON (Number n) | isInteger n = fmap (Val . toInteger)  (fromScientific n)
+    parseJSON (Number n) | isInteger n = fmap (Val . toInteger) (fromScientific n)
                          | otherwise   = fail "Не целое число"
     parseJSON (Object o) = Ex
       <$> o .: "x"
