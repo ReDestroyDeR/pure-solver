@@ -10,7 +10,7 @@ import           Data.IORef             (IORef, modifyIORef', readIORef)
 import           Control.Monad.IO.Class (liftIO)
 
 data Session = EmptySession
-newtype AppState = DummyAppState (IORef [Envelope Equation])
+newtype AppState = DummyAppState (IORef [Envelope Expression])
 
 type Api = SpockM () Session AppState ()
 type ApiAction a = SpockAction () Session AppState a
@@ -23,13 +23,14 @@ rest =
       equations <- liftIO $ readIORef ref
       json equations
     post ("api" <//> "v1" <//> "equations") $ do
-      equation <- jsonBody' :: ApiAction Equation
+      equation <- jsonBody' :: ApiAction Expression
       (DummyAppState ref) <- getState
       envelope <- liftIO $ createEnvelope equation
       liftIO $ modifyIORef' ref (envelope :)
       redirect "/api/v1/equations"
     put ("api" <//> "v1" <//> "equations" <//> var) $ \equationId -> do
       (DummyAppState ref) <- getState
+      text equationId
     delete ("api" <//> "v1" <//> "equations" <//> var) $ \equationId -> do
       (DummyAppState ref) <- getState
-
+      text equationId

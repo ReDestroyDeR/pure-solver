@@ -9,7 +9,11 @@ import Data.IORef
 
 main :: IO ()
 main =
-  do exampleEquation <- createEnvelope $ Equation [Expression 3 4 PLUS, Expression 7 8 MINUS]
+  do exampleEquation <- createEnvelope $
+              Ex
+                (Ex (Val 3) (Val 4) PLUS)
+                (Ex (Val 8) (Val 3) MINUS)
+                MULT
      ref <- newIORef [exampleEquation]
      spockCfg <- defaultSpockCfg EmptySession PCNoDatabase (DummyAppState ref)
      runSpock 8080 (spock spockCfg rest)

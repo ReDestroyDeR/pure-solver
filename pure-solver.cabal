@@ -41,6 +41,7 @@ library
     , primitive-extras >=0.8
     , primitive-unlifted >=0.1.3.0
     , reroute >=0.6.0.0
+    , scientific >=0.3.7
     , stm-containers >=1.2
     , stm-hamt >=1.2.0.4
     , text >=2.0.0
@@ -67,6 +68,7 @@ executable pure-solver-exe
     , primitive-unlifted >=0.1.3.0
     , pure-solver
     , reroute >=0.6.0.0
+    , scientific >=0.3.7
     , stm-containers >=1.2
     , stm-hamt >=1.2.0.4
     , text >=2.0.0
@@ -92,6 +94,7 @@ test-suite pure-solver-test
     , primitive-unlifted >=0.1.3.0
     , pure-solver
     , reroute >=0.6.0.0
+    , scientific >=0.3.7
     , stm-containers >=1.2
     , stm-hamt >=1.2.0.4
     , text >=2.0.0

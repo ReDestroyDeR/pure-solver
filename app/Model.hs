@@ -3,6 +3,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Model ( Symbol(..)
              , Envelope(..)
@@ -14,6 +16,9 @@ import            Data.Aeson   hiding (json)
 import            Data.UUID
 import            GHC.Generics
 import            Data.UUID.V4 (nextRandom)
+import            Data.Scientific
+import            Data.Maybe (fromMaybe)
+import Data.Aeson.Types (Parser)
 
 -- Symbol
 data Symbol
@@ -28,9 +33,24 @@ instance FromJSON Symbol
 data Expression = Val Integer | Ex Expression Expression Symbol
   deriving (Generic, Show, Eq)
 
+fromScientific :: Scientific -> Parser Int
+fromScientific s = case toBoundedInteger s of
+  Just x -> pure x
+  Nothing -> fail "Переданное число вышло за максимально допустимые границы"
+
 -- JSON
-instance ToJSON Expression
-instance FromJSON Expression
+instance ToJSON Expression where
+  toJSON (Val x) = toJSON x
+  toJSON (Ex a b s) = object ["x" .= toJSON a, "y" .= toJSON b, "operator" .= toJSON s]
+
+instance FromJSON Expression where
+    parseJSON (Number n) | isInteger n = fmap (Val . toInteger)  (fromScientific n)
+                         | otherwise   = fail "Не целое число"
+    parseJSON (Object o) = Ex
+      <$> o .: "x"
+      <*> o .: "y"
+      <*> o .: "operator"
+    parseJSON x = fail $ "Не могу обработать : " ++ show x
 
 ----------------------------------
 --          Evaluator           --
