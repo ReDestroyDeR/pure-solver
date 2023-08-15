@@ -4,11 +4,11 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE LambdaCase #-}
 
 module Model ( Symbol(..)
              , Envelope(..)
              , createEnvelope
+             , envelopeId
              , Expression(..)
              , evaluate ) where
 
@@ -17,8 +17,7 @@ import            Data.UUID
 import            GHC.Generics
 import            Data.UUID.V4 (nextRandom)
 import            Data.Scientific
-import            Data.Maybe (fromMaybe)
-import Data.Aeson.Types (Parser)
+import            Data.Aeson.Types (Parser)
 
 -- Symbol
 data Symbol
@@ -73,6 +72,9 @@ data Envelope a where
 deriving instance (Eq a) => Eq (Envelope a)
 deriving instance (Show a) => Show (Envelope a)
 deriving instance (ToJSON a, FromJSON a, Read a) => Read (Envelope a)
+
+envelopeId :: Envelope a -> UUID
+envelopeId (Envelope i _) = i
 
 createEnvelope :: (ToJSON a, FromJSON a) => a -> IO (Envelope a)
 createEnvelope a = do
